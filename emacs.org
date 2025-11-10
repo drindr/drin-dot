@@ -1,0 +1,288 @@
+#+startup: content indent
+#+property: header-args :tangle "~/.config/emacs/init.el"
+
+#+begin_src emacs-lisp
+  ;; This setup is generated from the Org file!!!
+#+end_src
+
+* early-init
+#+begin_src emacs-lisp :tangle "~/.config/emacs/early-init.el"
+  (tool-bar-mode 0)
+  (menu-bar-mode 0)
+  (scroll-bar-mode -1)
+#+end_src
+
+* package
+#+begin_src emacs-lisp
+  (require 'package)
+
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+  (package-initialize)
+#+end_src
+* chore
+#+begin_src emacs-lisp
+  (add-to-list 'default-frame-alist '(undecorated . t))
+  (column-number-mode 1)
+  (show-paren-mode 1)
+  (setq display-line-numbers-type 'relative)
+  ;; (global-display-line-numbers-mode 1) ; display-line-numbers-mode
+  (add-to-list 'display-buffer-alist '("\\`\\*\\(Warnings\\|Compile-Log\\)\\*\\'"
+                                       (display-buffer-no-window)
+                                       (allow-no-window . t)))
+  (setq-default inhibit-splash-screen t
+  	          make-backup-files nil
+  	          tab-width 4
+  	          indent-tabs-mode nil
+                )
+
+#+end_src
+** default mode
+#+begin_src emacs-lisp
+  (use-package delsel
+    :ensure nil
+    :hook (after-init . delete-selection-mode))
+#+end_src
+* font configuration
+#+begin_src emacs-lisp
+
+  ;; abcdefghijklmn
+  ;; 中西文等宽对齐(not italic)
+  ;;(set-face-attribute 'default nil :font (font-spec :family "Sarasa Term SC Nerd" :size 16))
+  (let ((mono-spaced-font "Maple Mono")
+        (proportionately-spaced-font "Noto Sans CJK SC"))
+    (set-face-attribute 'default nil :family mono-spaced-font :height 100)
+    (set-face-attribute 'fixed-pitch nil :family mono-spaced-font :height 1.0)
+    (set-face-attribute 'variable-pitch nil :family proportionately-spaced-font :height 1.0))
+  ;; (add-to-list 'default-frame-alist '(font . "Sarasa Term SC Nerd"))
+#+end_src
+* appearance
+#+begin_src emacs-lisp
+  (use-package catppuccin-theme
+    :ensure t
+    :config
+    (catppuccin-set-color 'base "#000000")
+    (load-theme 'catppuccin :no-confirm))
+
+  (use-package nerd-icons
+    :ensure t)
+
+  (use-package nerd-icons-corfu
+    :ensure t
+    :after corfu
+    :config 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
+
+  (use-package nerd-icons-dired
+    :ensure t
+    :hook
+    (dired-mode . nerd-icons-dired-mode))
+#+end_src
+* minibuffer
+#+begin_src emacs-lisp
+  ;; minibuffer
+  (use-package vertico
+    :ensure t
+    :hook (after-init . vertico-mode))
+
+  (use-package marginalia
+    :ensure t
+    :hook (after-init . marginalia-mode))
+
+  (use-package orderless
+    :ensure t
+    :config
+    (setq completion-styles '(orderless basic))
+    (setq completion-category-defatuls nil)
+    (setq completion-category-overrides nil))
+
+  (use-package savehist
+    :ensure nil
+    :hook (after-init . savehist-mode))
+#+end_src
+* completion
+#+begin_src emacs-lisp
+  (use-package corfu
+    :ensure t
+    :hook (after-init . global-corfu-mode)
+    :bind (:map corfu-map ("<tab>" . corfu-complete))
+    :config
+    (setq tab-always-indent 'complete)
+    (setq corfu-preview-current nil)
+    (setq corfu-min-width 20)
+
+    (setq corfu-popupinfo-delay '(1.25 . 0.5))
+    (corfu-popupinfo-mode 1)
+    (with-eval-after-load 'savehist
+      (corfu-history-mode 1)
+      (add-to-list 'savehist-additional-variables 'corfu-history)))
+
+  (use-package consult
+    :ensure t)
+#+end_src
+* dired
+#+begin_src emacs-lisp
+  (use-package dired
+    :ensure nil
+    :commands (dired)
+    :hook
+    ((dired-mode . dired-hide-details-mode) ;; on/off by "("
+     (dired-mode . hl-line-mode))
+    :config
+    (setq dired-recursive-copies 'always)
+    (setq dired-recursive-deletes 'always)
+    (setq dired-dwim-target t))
+
+  (use-package dired-subtree
+    :ensure t
+    :after dired
+    :bind
+    (:map dired-mode-map
+          ("<tab>" . dired-subtree-toggle)
+          ("TAB" . dired-subtree-toggle)
+          ("<backtab>" . dired-subtree-remove)
+          ("S-TAB" . dired-subtree-remove))
+    :config
+    (setq dired-subtree-use-backgrounds nil))
+
+  (use-package trashed
+    :ensure t
+    :commands (trashed)
+    :config
+    (setq trashed-action-confirmer 'y-or-n-p)
+    (setq trashed-use-header-line t)
+    (setq trashed-sort-key '("Date deleted" . t))
+    (setq trashed-date-format "%Y-%m-%d %H:%M:%S"))
+#+end_src
+* org
+#+begin_src emacs-lisp
+  (use-package org
+    :ensure nil
+    :config
+    (setq org-M-RET-may-split-line '((default . nil)))
+    (setq org-insert-heading-respect-content t)
+    (setq org-log-done 'time)
+    (setq org-log-into-drawer t)
+
+    (setq org-directory (expand-file-name "~/Documents/org/"))
+    (setq org-agenda-files (list org-directory))
+    (setq org-todo-keywords '((sequence "TODO(t)" "WAIT(w!)" "|" "CANCEL(c!)" "DONE(d!)"))))
+#+end_src
+** capture
+#+begin_src emacs-lisp
+
+#+end_src
+** export
+#+begin_src emacs-lisp
+
+  (setq org-export-backends '(html texinfo md))
+  (with-eval-after-load 'org
+    (setq org-export-with-toc t)
+    (setq org-export-headline-levels 8)
+    (setq org-export-dispatch-use-expert-ui nil)
+    (setq org-html-htmlize-output-type nil)
+    (setq org-html-head-include-default-style nil)
+    (setq org-html-head-include-scripts nil))
+#+end_src
+** tex
+#+begin_src emacs-lisp :var tex2svg-script=(concat (file-name-parent-directory buffer-file-name) "tex2svg.ts < %f > %O")
+  (with-eval-after-load 'org
+    (add-to-list 'org-preview-latex-process-alist
+                 `(mathjax-preview :programs ("deno") :description "latex > svg"
+                                   :message "you need to install the programs: deno."
+                                   :image-size-adjust (1.0 . 1.0)
+                                   ;; :image-input-type "svg"
+                                   :image-output-type "svg"
+                                   :latex-compiler (,tex2svg-script)))
+    (setq org-preview-latex-default-process 'mathjax-preview)
+    (defun org-create-formula-image-mathjax-preview
+        (string tofile options buffer &optional processing-type)
+      "Implements custom logic with the MathJax preview"
+      (let* ((processing-type (or processing-type
+      			                org-preview-latex-default-process)))
+        (if
+            (eq processing-type 'mathjax-preview)
+            ;; then
+            (let* ((processing-info (cdr (assq processing-type org-preview-latex-process-alist)))
+      	         (programs (plist-get processing-info :programs))
+      	         (error-message (or (plist-get processing-info :message) ""))
+      	         (image-input-type (plist-get processing-info :image-input-type))
+      	         (image-output-type (plist-get processing-info :image-output-type))
+      	         (post-clean (or (plist-get processing-info :post-clean)
+      			                 '(".dvi" ".xdv" ".pdf" ".tex" ".aux" ".log"
+      			                   ".svg" ".png" ".jpg" ".jpeg" ".out")))
+      	         (latex-compiler (plist-get processing-info :latex-compiler))
+                   (tmpdir temporary-file-directory)
+                   (texfilebase (make-temp-name
+      		                   (expand-file-name "orgtex" tmpdir)))
+      	         (texfile (concat texfilebase ".tex"))
+                   (log-buf (get-buffer-create "*Org Preview LaTeX Output*")))
+              
+              (let* ((prefix-regexp "^\\(\\$+\\|\\\\\\[\\)[[:space:]]*")
+                     (suffix-regexp "[[:space:]]*\\(\\$+\\|\\\\\\]\\)$")
+                     (temp-string (replace-regexp-in-string prefix-regexp "" string))        
+                     (result-string (replace-regexp-in-string suffix-regexp "" temp-string)))
+                (with-temp-file texfile
+                  (insert result-string))
+                )
+              
+              (let* ((err-msg (format "Please adjust `%s' part of `org-preview-latex-process-alist'."
+    		                            processing-type))
+                     (image-output-file (org-compile-file
+      	                               texfile latex-compiler image-output-type err-msg log-buf)))
+                (copy-file image-output-file tofile 'replace)
+                (dolist (e post-clean))
+                image-output-file)))))
+    (advice-add 'org-create-formula-image :around
+                (lambda (original-fun &rest args)
+                  "Anonymous advice for org-create-formula-image.
+                      Implements custom logic with the original function as a fallback."
+                  (unless (apply 'org-create-formula-image-mathjax-preview args)
+                    ((message "Falling back to built-in org-create-formula-image.")
+                     (apply original-fun args))))))
+#+end_src
+* markdown
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :ensure t
+    :mode ("README\\.md\\'" . gfm-mode)
+    :init (setq markdown-command "multimarkdown")
+    :config
+    (setq markdown-enable-math t))
+#+end_src
+* email
+#+begin_src emacs-lisp
+  (use-package notmuch
+    :ensure t)
+#+end_src
+* rss
+#+begin_src emacs-lisp :var feed-script=(concat (file-name-parent-directory buffer-file-name) "private/feed.el.gpg")
+  (use-package elfeed
+    :ensure t
+    :hook
+    (elfeed-search-mode .  (load (expand-file-name feed-script)))
+    :config
+    (setq elfeed-use-curl nil)
+    (setq elfeed-curl-max-connections 10)
+    (setq elfeed-db-directory (expand-file-name "elfeed/" user-emacs-directory)))
+#+end_src
+* security
+#+begin_src emacs-lisp
+  (use-package pass
+    :ensure t)
+  (use-package password-store
+    :ensure t)
+#+end_src
+* denote
+#+begin_src emacs-lisp
+  (use-package denote
+    :ensure t
+    :hook
+    ((dired-mode . denote-dired-mode)
+     (text-mode . denote-fontify-links-mode-maybe))
+    :config
+    (setq denote-excluded-directories-regexp "\\(imgs\\)\\|\\(ltximg\\)"))
+#+end_src
+* git
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t)
+#+end_src
