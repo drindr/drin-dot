@@ -163,7 +163,7 @@
     (setq org-log-into-drawer t)
 
     (setq org-directory (expand-file-name "~/Documents/org/"))
-    (setq org-agenda-files (list org-directory))
+    (setq org-agenda-files (list (expand-file-name "~/Documents/notes/agenda/")))
     (setq org-todo-keywords '((sequence "TODO(t)" "WAIT(w!)" "|" "CANCEL(c!)" "DONE(d!)"))))
 #+end_src
 ** capture
@@ -238,6 +238,10 @@
                   (unless (apply 'org-create-formula-image-mathjax-preview args)
                     ((message "Falling back to built-in org-create-formula-image.")
                      (apply original-fun args))))))
+  (use-package auctex
+    :ensure t)
+  (use-package cdlatex
+    :ensure t)
 #+end_src
 * markdown
 #+begin_src emacs-lisp

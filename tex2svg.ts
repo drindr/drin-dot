@@ -39,18 +39,18 @@ async function renderLatexToSvg() {
     };
 
     // 3. Typeset the LaTeX string and get the SVG output
-    const svgOutput = await MathJax.init({ loader: mathjaxConfig }).then(() => {
-        const svg =  MathJax.tex2svg(latexInput, {
-            // Sets the output scale (1 is default)
-            scale: 1, 
-            // Ensures the math is rendered in display mode if not already wrapped
-            display: true 
-        });
-        return MathJax.startup.adaptor.innerHTML(svg);
-    }).catch((err: any) => {
-        console.error("MathJax Rendering Error:", err);
+    await MathJax.init({ loader: mathjaxConfig }).catch((err: any) => {
+        console.error("MathJax Initialization Error:", err);
         Deno.exit(1);
     });
+    const svg = await MathJax.tex2svgPromise(latexInput, {
+    // Sets the output scale (1 is default)
+    scale: 1, 
+    // Ensures the math is rendered in display mode if not already wrapped
+    disnplay: true 
+    });
+    const svgOutput = MathJax.startup.adaptor.innerHTML(svg);
+
 
     // 4. Print the generated SVG to standard output
     // await Deno.stdout.write(new TextEncoder().encode(svgOutput));
