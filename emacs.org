@@ -21,7 +21,7 @@
 #+end_src
 * chore
 #+begin_src emacs-lisp
-  (add-to-list 'default-frame-alist '(undecorated . t))
+  ;; (add-to-list 'default-frame-alist '(undecorated . t))
   (column-number-mode 1)
   (show-paren-mode 1)
   (setq display-line-numbers-type 'relative)
@@ -50,9 +50,9 @@
   ;;(set-face-attribute 'default nil :font (font-spec :family "Sarasa Term SC Nerd" :size 16))
   (let ((mono-spaced-font "Maple Mono")
         (proportionately-spaced-font "Noto Sans CJK SC"))
-    (set-face-attribute 'default nil :family mono-spaced-font :height 100)
-    (set-face-attribute 'fixed-pitch nil :family mono-spaced-font :height 1.0)
-    (set-face-attribute 'variable-pitch nil :family proportionately-spaced-font :height 1.0))
+    (set-face-attribute 'default nil :family mono-spaced-font :height 150)
+    (set-face-attribute 'fixed-pitch nil :family mono-spaced-font :height 1.5)
+    (set-face-attribute 'variable-pitch nil :family proportionately-spaced-font :height 1.5))
   ;; (add-to-list 'default-frame-alist '(font . "Sarasa Term SC Nerd"))
 #+end_src
 * appearance
@@ -258,12 +258,11 @@
     :ensure t)
 #+end_src
 * rss
-#+begin_src emacs-lisp :var feed-script=(concat (file-name-parent-directory buffer-file-name) "private/feed.el.gpg")
+#+begin_src emacs-lisp :var feed-script=(concat (file-name-parent-directory buffer-file-name) "private/feed.el")
   (use-package elfeed
     :ensure t
-    :hook
-    (elfeed-search-mode .  (load (expand-file-name feed-script)))
     :config
+    (load feed-script)
     (setq elfeed-use-curl nil)
     (setq elfeed-curl-max-connections 10)
     (setq elfeed-db-directory (expand-file-name "elfeed/" user-emacs-directory)))
