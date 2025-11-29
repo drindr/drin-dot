@@ -23,15 +23,26 @@
 
 * input method
 #+begin_src emacs-lisp
-  (use-package rime
-    :ensure t
-    :config
-    (keymap-global-set "s-;" 'toggle-input-method)
-    (setq pgtk-use-im-context-on-new-connection nil) ; disable system IME
-    (setq rime-user-data-dir "~/.local/share/fcitx5/rime/")
-    :custom
-    (default-input-method "rime")
-    )
+    (use-package rime
+      :ensure t
+      :config
+
+      ;; setup in Archlinux
+      ;; (keymap-global-set "s-;" 'toggle-input-method)
+      ;; disable system IME
+      ;; (setq pgtk-use-im-context-on-new-connection nil)
+
+      ;; setup in MacOS
+      ;; Map command+; into control+\ with Karabiner to align with
+      ;; the system input source toggle shortcut
+      (setq rime-emacs-module-header-root
+            "/Applications/Emacs.app/Contents/Resources/include/")
+      (setq rime-librime-root "/opt/homebrew")
+      (setq rime-user-data-dir "~/Library/Rime/")
+      
+      :custom
+      (default-input-method "rime")
+      )
 #+end_src
 * chore
 #+begin_src emacs-lisp
